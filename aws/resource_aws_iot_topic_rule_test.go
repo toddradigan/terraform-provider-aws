@@ -892,6 +892,10 @@ resource "aws_vpc" "iot_vpc" {
 	cidr_block = "10.0.0.0/16"
 }
 
+resource "aws_secretsmanager_secret" "keystore" {
+	name = "keystore"
+}
+
 resource "aws_iot_topic_rule" "rule" {
   name        = "test_rule_%[1]s"
   description = "Example rule"
@@ -903,14 +907,10 @@ resource "aws_iot_topic_rule" "rule" {
     destination_arn    = aws_vpc.iot_vpc.arn
 		topic							 = "fake_topic"
 
-		client_properties {
-			bootstrap_servers = "b-1.localhost:9094"
+		bootstrap_servers = "b-1.localhost:9094"
 
-			ssl {
-				keystore 					= "fake_binary"
-				keystore_password = "password"
-			}
-		}
+		ssl_keystore 					= "${get_secret("aws_secretsmanager_secret.keystore.arn", "SecretBinary", "", "aws_iam_role.iot_role.arn")}"
+		ssl_keystore_password = "password"
   }
 }
 `, rName)

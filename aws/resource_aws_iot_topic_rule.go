@@ -269,165 +269,27 @@ func resourceAwsIotTopicRule() *schema.Resource {
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"client_properties": {
-							Type:     schema.TypeSet,
+						"acks": {
+							Type:         schema.TypeInt,
+							Optional:     true,
+							Default:      1,
+							ValidateFunc: validation.IntBetween(0, 1),
+						},
+						"bootstrap_servers": {
+							Type:     schema.TypeString,
 							Required: true,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"acks": {
-										Type:         schema.TypeInt,
-										Optional:     true,
-										Default:      1,
-										ValidateFunc: validation.IntBetween(0, 1),
-									},
-									"bootstrap_servers": {
-										Type:     schema.TypeString,
-										Required: true,
-									},
-									"compression_type": {
-										Type:     schema.TypeString,
-										Optional: true,
-										Default:  "none",
-										ValidateFunc: validation.StringInSlice([]string{
-											"none",
-											"gzip",
-											"snappy",
-											"lz4",
-											"zstd",
-										}, false),
-									},
-									"key_serializer": {
-										Type:     schema.TypeString,
-										Optional: true,
-										Default:  "StringSerializer",
-										ValidateFunc: validation.StringInSlice([]string{
-											"StringSerializer",
-										}, false),
-									},
-									"security_protocol": {
-										Type:     schema.TypeString,
-										Optional: true,
-										Default:  "SSL",
-										ValidateFunc: validation.StringInSlice([]string{
-											"SSL",
-											"SASL_SSL",
-										}, false),
-									},
-									"sasl": {
-										Type:     schema.TypeSet,
-										Optional: true,
-										Elem: &schema.Resource{
-											Schema: map[string]*schema.Schema{
-												"mechanism": {
-													Type:     schema.TypeString,
-													Optional: true,
-													ValidateFunc: validation.StringInSlice([]string{
-														"PLAIN",
-														"GSSAPI",
-														"SCRAM-SHA-512",
-													}, false),
-												},
-												"plain": {
-													Type:     schema.TypeSet,
-													Optional: true,
-													Elem: &schema.Resource{
-														Schema: map[string]*schema.Schema{
-															"username": {
-																Type:     schema.TypeString,
-																Required: true,
-															},
-															"password": {
-																Type:     schema.TypeString,
-																Required: true,
-															},
-														},
-													},
-												},
-												"scram": {
-													Type:     schema.TypeSet,
-													Optional: true,
-													Elem: &schema.Resource{
-														Schema: map[string]*schema.Schema{
-															"username": {
-																Type:     schema.TypeString,
-																Required: true,
-															},
-															"password": {
-																Type:     schema.TypeString,
-																Required: true,
-															},
-														},
-													},
-												},
-												"kerberos": {
-													Type:     schema.TypeSet,
-													Optional: true,
-													Elem: &schema.Resource{
-														Schema: map[string]*schema.Schema{
-															"keytab": {
-																Type:     schema.TypeString,
-																Required: true,
-															},
-															"krb5_kdc": {
-																Type:     schema.TypeString,
-																Required: true,
-															},
-															"krb5_realm": {
-																Type:     schema.TypeString,
-																Required: true,
-															},
-															"principal": {
-																Type:     schema.TypeString,
-																Required: true,
-															},
-															"service_name": {
-																Type:     schema.TypeString,
-																Required: true,
-															},
-														},
-													},
-												},
-											},
-										},
-									},
-									"ssl": {
-										Type:     schema.TypeSet,
-										Optional: true,
-										Elem: &schema.Resource{
-											Schema: map[string]*schema.Schema{
-												"keystore": {
-													Type:     schema.TypeString,
-													Required: true,
-												},
-												"keystore_password": {
-													Type:     schema.TypeString,
-													Required: true,
-												},
-												"key_password": {
-													Type:     schema.TypeString,
-													Optional: true,
-												},
-											},
-										},
-									},
-									"ssl_truststore": {
-										Type:     schema.TypeString,
-										Optional: true,
-									},
-									"ssl_truststore_password": {
-										Type:     schema.TypeString,
-										Optional: true,
-									},
-									"value_serializer": {
-										Type:     schema.TypeString,
-										Optional: true,
-										Default:  "ByteBufferSerializer",
-										ValidateFunc: validation.StringInSlice([]string{
-											"ByteBufferSerializer",
-										}, false),
-									},
-								},
-							},
+						},
+						"compression_type": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  "none",
+							ValidateFunc: validation.StringInSlice([]string{
+								"none",
+								"gzip",
+								"snappy",
+								"lz4",
+								"zstd",
+							}, false),
 						},
 						"destination_arn": {
 							Type:         schema.TypeString,
@@ -438,13 +300,103 @@ func resourceAwsIotTopicRule() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
+						"key_serializer": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  "org.apache.kafka.common.serialization.StringSerializer",
+							ValidateFunc: validation.StringInSlice([]string{
+								"org.apache.kafka.common.serialization.StringSerializer",
+							}, false),
+						},
 						"partition": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"sasl_kerberos_keytab": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"sasl_kerberos_krb5_kdc": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"sasl_kerberos_krb5_realm": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"sasl_kerberos_principal": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"sasl_kerberos_service_name": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"sasl_mechanism": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ValidateFunc: validation.StringInSlice([]string{
+								"PLAIN",
+								"GSSAPI",
+								"SCRAM-SHA-512",
+							}, false),
+						},
+						"sasl_plain_username": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"sasl_plain_password": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"sasl_scram_username": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"sasl_scram_password": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"security_protocol": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  "SSL",
+							ValidateFunc: validation.StringInSlice([]string{
+								"SSL",
+								"SASL_SSL",
+							}, false),
+						},
+						"ssl_key_password": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"ssl_keystore": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"ssl_keystore_password": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"ssl_truststore": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"ssl_truststore_password": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 						"topic": {
 							Type:     schema.TypeString,
 							Required: true,
+						},
+						"value_serializer": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  "org.apache.kafka.common.serialization.ByteBufferSerializer",
+							ValidateFunc: validation.StringInSlice([]string{
+								"org.apache.kafka.common.serialization.ByteBufferSerializer",
+							}, false),
 						},
 					},
 				},
@@ -1001,173 +953,27 @@ func resourceAwsIotTopicRule() *schema.Resource {
 							MaxItems: 1,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"client_properties": {
-										Type:     schema.TypeSet,
+									"acks": {
+										Type:         schema.TypeInt,
+										Optional:     true,
+										Default:      1,
+										ValidateFunc: validation.IntBetween(0, 1),
+									},
+									"bootstrap_servers": {
+										Type:     schema.TypeString,
 										Required: true,
-										Elem: &schema.Resource{
-											Schema: map[string]*schema.Schema{
-												"acks": {
-													Type:         schema.TypeInt,
-													Optional:     true,
-													Default:      1,
-													ValidateFunc: validation.IntBetween(0, 1),
-												},
-												"bootstrap_servers": {
-													Type:     schema.TypeList,
-													Required: true,
-													Elem: &schema.Resource{
-														Schema: map[string]*schema.Schema{
-															"bootstrap_server": {
-																Type:     schema.TypeString,
-																Required: true,
-															},
-														},
-													},
-												},
-												"compression_type": {
-													Type:     schema.TypeString,
-													Optional: true,
-													Default:  "none",
-													ValidateFunc: validation.StringInSlice([]string{
-														"none",
-														"gzip",
-														"snappy",
-														"lz4",
-														"zstd",
-													}, false),
-												},
-												"key_serializer": {
-													Type:     schema.TypeString,
-													Optional: true,
-													Default:  "StringSerializer",
-													ValidateFunc: validation.StringInSlice([]string{
-														"StringSerializer",
-													}, false),
-												},
-												"security_protocol": {
-													Type:     schema.TypeString,
-													Optional: true,
-													Default:  "SSL",
-													ValidateFunc: validation.StringInSlice([]string{
-														"SSL",
-														"SASL_SSL",
-													}, false),
-												},
-												"sasl": {
-													Type:     schema.TypeSet,
-													Optional: true,
-													Elem: &schema.Resource{
-														Schema: map[string]*schema.Schema{
-															"mechanism": {
-																Type:     schema.TypeString,
-																Optional: true,
-																ValidateFunc: validation.StringInSlice([]string{
-																	"PLAIN",
-																	"GSSAPI",
-																	"SCRAM-SHA-512",
-																}, false),
-															},
-															"plain": {
-																Type:     schema.TypeSet,
-																Optional: true,
-																Elem: &schema.Resource{
-																	Schema: map[string]*schema.Schema{
-																		"username": {
-																			Type:     schema.TypeString,
-																			Required: true,
-																		},
-																		"password": {
-																			Type:     schema.TypeString,
-																			Required: true,
-																		},
-																	},
-																},
-															},
-															"scram": {
-																Type:     schema.TypeSet,
-																Optional: true,
-																Elem: &schema.Resource{
-																	Schema: map[string]*schema.Schema{
-																		"username": {
-																			Type:     schema.TypeString,
-																			Required: true,
-																		},
-																		"password": {
-																			Type:     schema.TypeString,
-																			Required: true,
-																		},
-																	},
-																},
-															},
-															"kerberos": {
-																Type:     schema.TypeSet,
-																Optional: true,
-																Elem: &schema.Resource{
-																	Schema: map[string]*schema.Schema{
-																		"keytab": {
-																			Type:     schema.TypeString,
-																			Required: true,
-																		},
-																		"krb5_kdc": {
-																			Type:     schema.TypeString,
-																			Required: true,
-																		},
-																		"krb5_realm": {
-																			Type:     schema.TypeString,
-																			Required: true,
-																		},
-																		"principal": {
-																			Type:     schema.TypeString,
-																			Required: true,
-																		},
-																		"service_name": {
-																			Type:     schema.TypeString,
-																			Required: true,
-																		},
-																	},
-																},
-															},
-														},
-													},
-												},
-												"ssl": {
-													Type:     schema.TypeSet,
-													Optional: true,
-													Elem: &schema.Resource{
-														Schema: map[string]*schema.Schema{
-															"keystore": {
-																Type:     schema.TypeString,
-																Required: true,
-															},
-															"keystore_password": {
-																Type:     schema.TypeString,
-																Required: true,
-															},
-															"key_password": {
-																Type:     schema.TypeString,
-																Optional: true,
-															},
-														},
-													},
-												},
-												"ssl_truststore": {
-													Type:     schema.TypeString,
-													Optional: true,
-												},
-												"ssl_truststore_password": {
-													Type:     schema.TypeString,
-													Optional: true,
-												},
-												"value_serializer": {
-													Type:     schema.TypeString,
-													Optional: true,
-													Default:  "ByteBufferSerializer",
-													ValidateFunc: validation.StringInSlice([]string{
-														"ByteBufferSerializer",
-													}, false),
-												},
-											},
-										},
+									},
+									"compression_type": {
+										Type:     schema.TypeString,
+										Optional: true,
+										Default:  "none",
+										ValidateFunc: validation.StringInSlice([]string{
+											"none",
+											"gzip",
+											"snappy",
+											"lz4",
+											"zstd",
+										}, false),
 									},
 									"destination_arn": {
 										Type:         schema.TypeString,
@@ -1178,13 +984,103 @@ func resourceAwsIotTopicRule() *schema.Resource {
 										Type:     schema.TypeString,
 										Optional: true,
 									},
+									"key_serializer": {
+										Type:     schema.TypeString,
+										Optional: true,
+										Default:  "org.apache.kafka.common.serialization.StringSerializer",
+										ValidateFunc: validation.StringInSlice([]string{
+											"org.apache.kafka.common.serialization.StringSerializer",
+										}, false),
+									},
 									"partition": {
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"sasl_kerberos_keytab": {
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"sasl_kerberos_krb5_kdc": {
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"sasl_kerberos_krb5_realm": {
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"sasl_kerberos_principal": {
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"sasl_kerberos_service_name": {
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"sasl_mechanism": {
+										Type:     schema.TypeString,
+										Optional: true,
+										ValidateFunc: validation.StringInSlice([]string{
+											"PLAIN",
+											"GSSAPI",
+											"SCRAM-SHA-512",
+										}, false),
+									},
+									"sasl_plain_username": {
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"sasl_plain_password": {
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"sasl_scram_username": {
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"sasl_scram_password": {
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"security_protocol": {
+										Type:     schema.TypeString,
+										Optional: true,
+										Default:  "SSL",
+										ValidateFunc: validation.StringInSlice([]string{
+											"SSL",
+											"SASL_SSL",
+										}, false),
+									},
+									"ssl_key_password": {
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"ssl_keystore": {
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"ssl_keystore_password": {
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"ssl_truststore": {
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"ssl_truststore_password": {
 										Type:     schema.TypeString,
 										Optional: true,
 									},
 									"topic": {
 										Type:     schema.TypeString,
 										Required: true,
+									},
+									"value_serializer": {
+										Type:     schema.TypeString,
+										Optional: true,
+										Default:  "org.apache.kafka.common.serialization.ByteBufferSerializer",
+										ValidateFunc: validation.StringInSlice([]string{
+											"org.apache.kafka.common.serialization.ByteBufferSerializer",
+										}, false),
 									},
 								},
 							},
@@ -1928,125 +1824,115 @@ func expandIotKafkaAction(tfList []interface{}) *iot.KafkaAction {
 
 	apiObject := &iot.KafkaAction{}
 	tfMap := tfList[0].(map[string]interface{})
+	clientProperties := make(map[string]*string)
+
+	if v, ok := tfMap["acks"].(string); ok && v != "" {
+		clientProperties["acks"] = aws.String(v)
+	}
+
+	if v, ok := tfMap["bootstrap_servers"].(string); ok && v != "" {
+		clientProperties["bootstrap.servers"] = aws.String(v)
+	}
+
+	if v, ok := tfMap["compression_type"].(string); ok && v != "" {
+		clientProperties["compression.type"] = aws.String(v)
+	}
 
 	if v, ok := tfMap["destination_arn"].(string); ok && v != "" {
 		apiObject.DestinationArn = aws.String(v)
 	}
+
 	if v, ok := tfMap["key"].(string); ok && v != "" {
 		apiObject.Key = aws.String(v)
 	}
+
+	if v, ok := tfMap["key_serializer"].(string); ok && v != "" {
+		clientProperties["key.serializer"] = aws.String(v)
+	}
+
 	if v, ok := tfMap["partition"].(string); ok && v != "" {
 		apiObject.Partition = aws.String(v)
 	}
-	if v, ok := tfMap["topic"].(string); ok && v != "" {
-		apiObject.Topic = aws.String(v)
-	}
 
-	if cp, ok := tfMap["client_properties"].(map[string]interface{}); ok && cp != nil {
-		clientProperties := make(map[string]*string)
+	if sp, ok := tfMap["security_protocol"].(string); ok && sp != "" {
+		clientProperties["security.protocol"] = aws.String(sp)
 
-		if v, ok := cp["acks"].(string); ok && v != "" {
-			clientProperties["acks"] = aws.String(v)
-		}
+		switch sp {
+		case "SSL":
+			if v, ok := tfMap["ssl_keystore"].(string); ok && v != "" {
+				clientProperties["ssl.keystore"] = aws.String(v)
+			}
 
-		if v, ok := cp["bootstrap_servers"].(string); ok && v != "" {
-			clientProperties["bootstrap.servers"] = aws.String(v)
-		}
+			if v, ok := tfMap["ssl_keystore_password"].(string); ok && v != "" {
+				clientProperties["ssl.keystore.password"] = aws.String(v)
+			}
 
-		if v, ok := cp["compression_type"].(string); ok && v != "" {
-			clientProperties["compression.type"] = aws.String(v)
-		}
+			if v, ok := tfMap["ssl_key_password"].(string); ok && v != "" {
+				clientProperties["ssl.key.password"] = aws.String(v)
+			}
+		case "SASL":
+			if mechanism, ok := tfMap["sasl_mechanism"].(string); ok && mechanism != "" {
+				clientProperties["sasl.mechanism"] = aws.String(mechanism)
 
-		if v, ok := cp["key_serializer"].(string); ok && v != "" {
-			clientProperties["key.serializer"] = aws.String(v)
-		}
-
-		if v, ok := cp["value_serializer"].(string); ok && v != "" {
-			clientProperties["value.serializer"] = aws.String(v)
-		}
-
-		if v, ok := cp["ssl_truststore"].(string); ok && v != "" {
-			clientProperties["ssl.truststore"] = aws.String(v)
-		}
-
-		if v, ok := cp["ssl_truststore_password"].(string); ok && v != "" {
-			clientProperties["ssl.truststore.password"] = aws.String(v)
-		}
-
-		if sp, ok := cp["security_protocol"].(string); ok && sp != "" {
-			clientProperties["security.protocol"] = aws.String(sp)
-
-			switch sp {
-			case "SSL":
-				if ssl, ok := cp["ssl"].(map[string]interface{}); ok && ssl != nil {
-					if v, ok := ssl["keystore"].(string); ok && v != "" {
-						clientProperties["ssl.keystore"] = aws.String(v)
+				switch mechanism {
+				case "PLAIN":
+					if v, ok := tfMap["sasl_plain_username"].(string); ok && v != "" {
+						clientProperties["sasl.plain.username"] = aws.String(v)
 					}
 
-					if v, ok := ssl["keystore_password"].(string); ok && v != "" {
-						clientProperties["ssl.keystore.password"] = aws.String(v)
+					if v, ok := tfMap["sasl_plain_password"].(string); ok && v != "" {
+						clientProperties["sasl.plain.password"] = aws.String(v)
+					}
+				case "SCRAM-SHA-512":
+					if v, ok := tfMap["sasl_scram_username"].(string); ok && v != "" {
+						clientProperties["sasl.scram.username"] = aws.String(v)
 					}
 
-					if v, ok := ssl["key_password"].(string); ok && v != "" {
-						clientProperties["ssl.key.password"] = aws.String(v)
+					if v, ok := tfMap["sasl_scram_password"].(string); ok && v != "" {
+						clientProperties["sasl.scram.password"] = aws.String(v)
 					}
-				}
-			case "SASL":
-				if sasl, ok := cp["sasl"].(map[string]interface{}); ok && sasl != nil {
-					if m, ok := sasl["mechanism"].(string); ok && m != "" {
-						clientProperties["sasl.mechanism"] = aws.String(m)
+				case "GSSAPI":
+					if v, ok := tfMap["sasl_kerberos_keytab"].(string); ok && v != "" {
+						clientProperties["sasl.kerberos.keytab"] = aws.String(v)
+					}
 
-						switch m {
-						case "PLAIN":
-							if plain, ok := sasl["plain"].(map[string]interface{}); ok && plain != nil {
-								if v, ok := plain["username"].(string); ok && v != "" {
-									clientProperties["sasl.plain.username"] = aws.String(v)
-								}
+					if v, ok := tfMap["sasl_kerberos_krb5_kdc"].(string); ok && v != "" {
+						clientProperties["sasl.kerberos.krb5.kdc"] = aws.String(v)
+					}
 
-								if v, ok := plain["password"].(string); ok && v != "" {
-									clientProperties["sasl.plain.password"] = aws.String(v)
-								}
-							}
-						case "SCRAM-SHA-512":
-							if scram, ok := sasl["scram"].(map[string]interface{}); ok && scram != nil {
-								if v, ok := scram["username"].(string); ok && v != "" {
-									clientProperties["sasl.scram.username"] = aws.String(v)
-								}
+					if v, ok := tfMap["sasl_kerberos_krb5_realm"].(string); ok && v != "" {
+						clientProperties["sasl.kerberos.krb5.realm"] = aws.String(v)
+					}
 
-								if v, ok := scram["password"].(string); ok && v != "" {
-									clientProperties["sasl.scram.password"] = aws.String(v)
-								}
-							}
-						case "GSSAPI":
-							if kerberos, ok := sasl["kerberos"].(map[string]interface{}); ok && kerberos != nil {
-								if v, ok := kerberos["keytab"].(string); ok && v != "" {
-									clientProperties["sasl.kerberos.keytab"] = aws.String(v)
-								}
+					if v, ok := tfMap["sasl_kerberos_principal"].(string); ok && v != "" {
+						clientProperties["sasl.kerberos.principal"] = aws.String(v)
+					}
 
-								if v, ok := kerberos["service_name"].(string); ok && v != "" {
-									clientProperties["sasl.kerberos.service.name"] = aws.String(v)
-								}
-
-								if v, ok := kerberos["krb5_kdc"].(string); ok && v != "" {
-									clientProperties["sasl.kerberos.krb5.kdc"] = aws.String(v)
-								}
-
-								if v, ok := kerberos["krb5_realm"].(string); ok && v != "" {
-									clientProperties["sasl.kerberos.krb5.realm"] = aws.String(v)
-								}
-
-								if v, ok := kerberos["principal"].(string); ok && v != "" {
-									clientProperties["sasl.kerberos.principal"] = aws.String(v)
-								}
-							}
-						}
+					if v, ok := tfMap["sasl_kerberos_service_name"].(string); ok && v != "" {
+						clientProperties["sasl.kerberos.service.name"] = aws.String(v)
 					}
 				}
 			}
 		}
-
-		apiObject.ClientProperties = clientProperties
 	}
+
+	if v, ok := tfMap["ssl_truststore"].(string); ok && v != "" {
+		clientProperties["ssl.truststore"] = aws.String(v)
+	}
+
+	if v, ok := tfMap["ssl_truststore_password"].(string); ok && v != "" {
+		clientProperties["ssl.truststore.password"] = aws.String(v)
+	}
+
+	if v, ok := tfMap["topic"].(string); ok && v != "" {
+		apiObject.Topic = aws.String(v)
+	}
+
+	if v, ok := tfMap["value_serializer"].(string); ok && v != "" {
+		clientProperties["value.serializer"] = aws.String(v)
+	}
+
+	apiObject.ClientProperties = clientProperties
 
 	return apiObject
 }
@@ -2965,121 +2851,97 @@ func flattenIotKafkaAction(apiObject *iot.KafkaAction) []interface{} {
 	}
 
 	if cp := apiObject.ClientProperties; cp != nil {
-		cpMap := make(map[string]interface{})
-
 		if v, ok := cp["acks"]; ok && v != nil {
-			cpMap["acks"] = aws.StringValue(v)
+			tfMap["acks"] = aws.StringValue(v)
 		}
 
 		if v, ok := cp["bootstrap.servers"]; ok && v != nil {
-			cpMap["bootstrap_servers"] = aws.StringValue(v)
+			tfMap["bootstrap_servers"] = aws.StringValue(v)
 		}
 
 		if v, ok := cp["compression.type"]; ok && v != nil {
-			cpMap["compression_type"] = aws.StringValue(v)
+			tfMap["compression_type"] = aws.StringValue(v)
 		}
 
 		if v, ok := cp["key.serializer"]; ok && v != nil {
-			cpMap["key_serializer"] = aws.StringValue(v)
+			tfMap["key_serializer"] = aws.StringValue(v)
 		}
 
 		if v, ok := cp["value.serializer"]; ok && v != nil {
-			cpMap["value_serializer"] = aws.StringValue(v)
+			tfMap["value_serializer"] = aws.StringValue(v)
 		}
 
 		if v, ok := cp["ssl.truststore"]; ok && v != nil {
-			cpMap["ssl_truststore"] = aws.StringValue(v)
+			tfMap["ssl_truststore"] = aws.StringValue(v)
 		}
 
 		if v, ok := cp["ssl.truststore.password"]; ok && v != nil {
-			cpMap["ssl_truststore_password"] = aws.StringValue(v)
+			tfMap["ssl_truststore_password"] = aws.StringValue(v)
 		}
 
 		if sp, ok := cp["security.protocol"]; ok && sp != nil {
 			protocol := aws.StringValue(sp)
-			cpMap["security_protocol"] = protocol
+			tfMap["security_protocol"] = protocol
 
 			switch protocol {
 			case "SSL":
-				sslMap := make(map[string]interface{})
-
 				if v, ok := cp["ssl.keystore"]; ok && v != nil {
-					sslMap["keystore"] = aws.StringValue(v)
+					tfMap["ssl_keystore"] = aws.StringValue(v)
 				}
 
 				if v, ok := cp["ssl.keystore.password"]; ok && v != nil {
-					sslMap["keystore_password"] = aws.StringValue(v)
+					tfMap["ssl_keystore_password"] = aws.StringValue(v)
 				}
 
 				if v, ok := cp["ssl.key.password"]; ok && v != nil {
-					sslMap["key_password"] = aws.StringValue(v)
+					tfMap["ssl_key_password"] = aws.StringValue(v)
 				}
-
-				cpMap["ssl"] = sslMap
 			case "SASL":
-				saslMap := make(map[string]interface{})
-
 				if m, ok := cp["sasl.mechanism"]; ok && m != nil {
 					mechanism := aws.StringValue(m)
-					saslMap["mechanism"] = mechanism
+					tfMap["sasl_mechanism"] = mechanism
 
 					switch mechanism {
 					case "PLAIN":
-						plainMap := make(map[string]interface{})
-
 						if v, ok := cp["sasl.plain.username"]; ok && v != nil {
-							plainMap["username"] = aws.StringValue(v)
+							tfMap["sasl_plain_username"] = aws.StringValue(v)
 						}
 
 						if v, ok := cp["sasl.plain.password"]; ok && v != nil {
-							plainMap["password"] = aws.StringValue(v)
+							tfMap["sasl_plain_password"] = aws.StringValue(v)
 						}
-
-						saslMap["plain"] = plainMap
 					case "SCRAM-SHA-512":
-						scramMap := make(map[string]interface{})
-
 						if v, ok := cp["sasl.scram.username"]; ok && v != nil {
-							scramMap["username"] = aws.StringValue(v)
+							tfMap["sasl_scram_username"] = aws.StringValue(v)
 						}
 
 						if v, ok := cp["sasl.scram.password"]; ok && v != nil {
-							scramMap["password"] = aws.StringValue(v)
+							tfMap["sasl_scram_password"] = aws.StringValue(v)
 						}
-
-						saslMap["scram"] = scramMap
 					case "GSSAPI":
-						kerberosMap := make(map[string]interface{})
-
 						if v, ok := cp["sasl.kerberos.keytab"]; ok && v != nil {
-							kerberosMap["keytab"] = aws.StringValue(v)
-						}
-
-						if v, ok := cp["sasl.kerberos.service.name"]; ok && v != nil {
-							kerberosMap["service_name"] = aws.StringValue(v)
+							tfMap["sasl_kerberos_keytab"] = aws.StringValue(v)
 						}
 
 						if v, ok := cp["sasl.kerberos.krb5.kdc"]; ok && v != nil {
-							kerberosMap["krb5_kdc"] = aws.StringValue(v)
+							tfMap["sasl_kerberos_krb5_kdc"] = aws.StringValue(v)
 						}
 
 						if v, ok := cp["sasl.kerberos.krb5.realm"]; ok && v != nil {
-							kerberosMap["krb5_realm"] = aws.StringValue(v)
+							tfMap["sasl_kerberos_krb5_realm"] = aws.StringValue(v)
 						}
 
 						if v, ok := cp["sasl.kerberos.principal"]; ok && v != nil {
-							kerberosMap["principal"] = aws.StringValue(v)
+							tfMap["sasl_kerberos_principal"] = aws.StringValue(v)
 						}
 
-						saslMap["kerberos"] = kerberosMap
+						if v, ok := cp["sasl.kerberos.service.name"]; ok && v != nil {
+							tfMap["sasl_kerberos_service_name"] = aws.StringValue(v)
+						}
 					}
 				}
-
-				cpMap["sasl"] = saslMap
 			}
 		}
-
-		tfMap["client_properties"] = cpMap
 	}
 
 	return []interface{}{tfMap}

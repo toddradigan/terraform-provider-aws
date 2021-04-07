@@ -281,16 +281,8 @@ func resourceAwsIotTopicRule() *schema.Resource {
 										ValidateFunc: validation.IntBetween(0, 1),
 									},
 									"bootstrap_servers": {
-										Type:     schema.TypeList,
+										Type:     schema.TypeString,
 										Required: true,
-										Elem: &schema.Resource{
-											Schema: map[string]*schema.Schema{
-												"bootstrap_server": {
-													Type:     schema.TypeString,
-													Required: true,
-												},
-											},
-										},
 									},
 									"compression_type": {
 										Type:     schema.TypeString,
